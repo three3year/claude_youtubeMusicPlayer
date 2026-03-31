@@ -303,6 +303,21 @@ body {
   white-space: nowrap;
 }
 
+.imported-item summary .imported-link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  padding: 2px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.imported-item summary .imported-link-btn:hover {
+  color: var(--accent-blue);
+}
+
 .imported-item summary .imported-load-btn {
   background: linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light));
   color: white;

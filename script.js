@@ -9,6 +9,7 @@ let timeUpdateInterval = null;
 let currentVideoId = null;
 let apiReady = false;
 let timestamps = []; // { time: number, label: string }
+let currentVideoTitle = '';
 
 // ── DOM refs ──
 const urlInput = document.getElementById('url-input');
@@ -38,6 +39,7 @@ const batchClearBtn = document.getElementById('batch-clear-btn');
 const timelineList = document.getElementById('timeline-list');
 const timelineEmpty = document.getElementById('timeline-empty');
 const timelineCount = document.getElementById('timeline-count');
+const timelineTitleEl = document.getElementById('timeline-title');
 const exportBtn = document.getElementById('export-btn');
 const importFile = document.getElementById('import-file');
 const importedList = document.getElementById('imported-list');
@@ -380,12 +382,16 @@ function updatePlayerTrackInfo(idx) {
 }
 
 function updatePlayerInfo() {
-  if (timestamps.length === 0 && player) {
+  if (player) {
     try {
       const data = player.getVideoData && player.getVideoData();
       if (data && data.title) {
-        playerTitle.textContent = data.title;
-        playerSubtitle.textContent = data.author || '';
+        currentVideoTitle = data.title;
+        timelineTitleEl.textContent = currentVideoTitle;
+        if (timestamps.length === 0) {
+          playerTitle.textContent = data.title;
+          playerSubtitle.textContent = data.author || '';
+        }
       }
     } catch(e) {}
   }
@@ -513,6 +519,7 @@ exportBtn.addEventListener('click', function() {
   var url = urlInput.value.trim() || 'unknown';
   var data = {
     url: url,
+    title: currentVideoTitle || '',
     timestamps: timestamps.map(function(ts) {
       return { time: formatTime(ts.time), label: ts.label };
     })
@@ -520,8 +527,8 @@ exportBtn.addEventListener('click', function() {
   var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  var safeName = (currentVideoId || 'playlist').replace(/[^a-zA-Z0-9_-]/g, '_');
-  a.download = safeName + '_timestamps.json';
+  var safeName = (currentVideoTitle || currentVideoId || 'playlist').replace(/[^a-zA-Z0-9_\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff -]/g, '_');
+  a.download = safeName + '.json';
   a.click();
   URL.revokeObjectURL(a.href);
 });
@@ -550,9 +557,13 @@ function renderImportedList() {
     var details = document.createElement('details');
     details.className = 'imported-item';
     var summary = document.createElement('summary');
+    var displayName = pl.title || pl.url;
     summary.innerHTML =
       '<span class="arrow">&#9654;</span>' +
-      '<span class="imported-title">' + escapeHtml(pl.url) + '</span>' +
+      '<span class="imported-title">' + escapeHtml(displayName) + '</span>' +
+      '<a class="imported-link-btn" href="' + escapeHtml(pl.url) + '" target="_blank" rel="noopener" title="Open link" data-link>' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>' +
+      '</a>' +
       '<button class="imported-load-btn" data-idx="' + pi + '">Load</button>';
     details.appendChild(summary);
     var ul = document.createElement('ul');
@@ -568,6 +579,11 @@ function renderImportedList() {
 }
 
 importedList.addEventListener('click', function(e) {
+  // Let link clicks pass through naturally
+  if (e.target.closest('[data-link]')) {
+    e.stopPropagation();
+    return;
+  }
   var btn = e.target.closest('.imported-load-btn');
   if (!btn) return;
   e.preventDefault();
