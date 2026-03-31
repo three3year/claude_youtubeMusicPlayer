@@ -527,7 +527,7 @@ exportBtn.addEventListener('click', function() {
   var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  var safeName = (currentVideoTitle || currentVideoId || 'playlist').replace(/[^a-zA-Z0-9_\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff -]/g, '_');
+  var safeName = (currentVideoTitle || currentVideoId || 'playlist').replace(/[^a-zA-Z0-9_\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff -]/g, '_').substring(0, 20);
   a.download = safeName + '.json';
   a.click();
   URL.revokeObjectURL(a.href);
@@ -535,18 +535,20 @@ exportBtn.addEventListener('click', function() {
 
 // Import file
 importFile.addEventListener('change', function(e) {
-  var file = e.target.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(ev) {
-    try {
-      var data = JSON.parse(ev.target.result);
-      if (!data.url || !Array.isArray(data.timestamps)) return;
-      importedPlaylists.push(data);
-      renderImportedList();
-    } catch(err) {}
-  };
-  reader.readAsText(file);
+  var files = e.target.files;
+  if (!files.length) return;
+  Array.from(files).forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        var data = JSON.parse(ev.target.result);
+        if (!data.url || !Array.isArray(data.timestamps)) return;
+        importedPlaylists.push(data);
+        renderImportedList();
+      } catch(err) {}
+    };
+    reader.readAsText(file);
+  });
   importFile.value = '';
 });
 
@@ -594,6 +596,10 @@ importedList.addEventListener('click', function(e) {
   // Load the URL
   urlInput.value = pl.url;
   loadBtn.click();
+  // Set the full title to the timeline header
+  var fullTitle = pl.title || pl.url;
+  timelineTitleEl.textContent = fullTitle;
+  currentVideoTitle = fullTitle;
   // Clear current timestamps and load imported ones
   timestamps = [];
   pl.timestamps.forEach(function(ts) {
