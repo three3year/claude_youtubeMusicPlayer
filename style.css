@@ -740,3 +740,62 @@ body {
 
   .progress-row { max-width: 100%; }
 }
+
+/* ── Narrow (< 500px): Timeline + Player only ── */
+@media (max-width: 500px) {
+  body {
+    overflow: hidden;
+    padding-bottom: 0;
+    height: 100vh;
+  }
+
+  .main-left,
+  .main-center {
+    display: none;
+  }
+
+  .main-content {
+    padding: 0;
+    margin: 0;
+  }
+
+  .main-right {
+    flex: none;
+    width: 100%;
+  }
+
+  .timeline-card {
+    border-radius: 0;
+    border: none;
+    max-height: none;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .timeline-card::-webkit-scrollbar {
+    display: none;
+  }
+
+  .timeline-header {
+    display: none;
+  }
+
+  .timeline-item .ts-index,
+  .timeline-item .ts-title,
+  .timeline-item .ts-delete {
+    display: none;
+  }
+
+  .timeline-item {
+    justify-content: center;
+  }
+
+  .timeline-item .ts-time-display {
+    width: auto;
+    font-size: 16px;
+    text-align: center;
+  }
+}
