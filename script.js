@@ -154,6 +154,7 @@ function onPlayerReady(event) {
   isPlaying = true;
   updatePlayPauseIcon();
   updateTimeDisplay();
+  renderAnchorMarkers();
   startTimePolling();
   playerBar.classList.add('visible');
   updatePlayerInfo();
@@ -355,6 +356,7 @@ function renderTimeline() {
     });
     timelineList.appendChild(li);
   });
+  renderAnchorMarkers();
 }
 
 function updateActiveTimestamp() {
@@ -401,6 +403,20 @@ function updatePlayPauseIcon() {
   iconPlay.style.display = isPlaying ? 'none' : 'block';
   iconPause.style.display = isPlaying ? 'block' : 'none';
   playPauseBtn.title = isPlaying ? 'Pause' : 'Play';
+}
+
+function renderAnchorMarkers() {
+  var old = progressBar.querySelectorAll('.progress-anchor-marker');
+  for (var i = 0; i < old.length; i++) old[i].remove();
+  if (duration <= 0) return;
+  for (var j = 0; j < timestamps.length; j++) {
+    var pct = (timestamps[j].time / duration) * 100;
+    var marker = document.createElement('div');
+    marker.className = 'progress-anchor-marker';
+    marker.style.left = pct + '%';
+    marker.title = (timestamps[j].label || 'Track ' + (j + 1)) + ' (' + formatTime(timestamps[j].time) + ')';
+    progressBar.appendChild(marker);
+  }
 }
 
 function updateTimeDisplay() {

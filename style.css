@@ -612,6 +612,17 @@ body {
   position: relative;
 }
 
+/* 進度條時間軸錨點 */
+.progress-anchor-marker {
+  position: absolute;
+  width: 2px;
+  height: 10px;
+  top: -3px;
+  background: rgba(236, 72, 153, 0.6);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
 .progress-fill {
   height: 100%;
   border-radius: 2px;
