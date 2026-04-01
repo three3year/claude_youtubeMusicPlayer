@@ -328,6 +328,7 @@ function renderTimeline() {
   if (timestamps.length === 0) {
     timelineEmpty.style.display = 'block';
     timelineCount.textContent = '';
+    renderAnchorMarkers();
     return;
   }
   timelineEmpty.style.display = 'none';
