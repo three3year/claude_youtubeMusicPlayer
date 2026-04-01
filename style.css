@@ -784,9 +784,12 @@ body {
   }
 
   .timeline-item .ts-index,
-  .timeline-item .ts-title,
-  .timeline-item .ts-delete {
+  .timeline-item .ts-title {
     display: none;
+  }
+
+  .timeline-item .ts-delete {
+    opacity: 1;
   }
 
   .timeline-item {
