@@ -225,6 +225,14 @@ window.PlaylistMode = {
     el.style.display = msg ? 'block' : 'none';
   },
 
+  // ── 切離模式時的 cleanup（由 core.js setAppMode 呼叫）──
+  onLeave: function() {
+    var P = PlaylistMode;
+    P.currentIndex = -1;
+    P.shufflePos = 0;
+    P.render();
+  },
+
   // ── Title 取得：當歌曲開始播放時，從 player.getVideoData() 補上真實 title ──
   onPlayingHook: function() {
     var P = PlaylistMode;
@@ -342,6 +350,7 @@ window.PlaylistMode = {
       onPlaying:       P.onPlayingHook,    // 抓 title
       onActivePoll:    function() {},      // 不需要
       onAnchorMarkers: function() {},      // 不畫 markers
+      onLeave:         P.onLeave,
     };
   },
 };

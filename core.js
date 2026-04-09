@@ -275,7 +275,29 @@ window.App = {
 
   // ── 模式切換 ──
   setAppMode: function(mode) {
-    App.state.appMode = mode;
+    var s = App.state;
+    var changing = (s.appMode !== mode);
+
+    if (changing) {
+      // 通知舊模式做 cleanup（清掉自己的 currently-playing 指標）
+      var oldMode = App.modes[s.appMode];
+      if (oldMode && oldMode.onLeave) oldMode.onLeave();
+
+      // 清空播放狀態：暫停播放、重置共用 state、隱藏 player bar
+      if (s.player && s.player.pauseVideo) {
+        try { s.player.pauseVideo(); } catch(e) {}
+      }
+      s.isPlaying = false;
+      s.currentTime = 0;
+      s.duration = 0;
+      if (App.el.playerTitle) App.el.playerTitle.textContent = '-';
+      if (App.el.playerSubtitle) App.el.playerSubtitle.textContent = '-';
+      if (App.el.playerBar) App.el.playerBar.classList.remove('visible');
+      if (App.el.iconPlay) App.updatePlayPauseIcon();
+      if (App.el.timeCurrent) App.updateTimeDisplay();
+    }
+
+    s.appMode = mode;
     document.querySelectorAll('.mode-btn').forEach(function(b) {
       b.classList.toggle('active', b.dataset.mode === mode);
     });
@@ -287,10 +309,16 @@ window.App = {
       el.style.display = mode === 'playlist' ? '' : 'none';
     });
     try { localStorage.setItem('prism_mode', mode); } catch(e) {}
-    // 切換時重畫 markers + 重抓 title
+
+    // 重畫進度條 markers（playlist 模式的 hook 是 no-op，等於清空）
     App.renderAnchorMarkers();
-    var m = App.modes[mode];
-    if (m && m.onPlaying) m.onPlaying();
+
+    // 只在「非切換」（初始化）情況下呼叫 onPlaying 重抓 title；
+    // 切換時保持「未播放」狀態，避免覆蓋掉剛清空的 title
+    if (!changing) {
+      var m = App.modes[mode];
+      if (m && m.onPlaying) m.onPlaying();
+    }
   },
 
   // ── 初始化（DOMContentLoaded 時呼叫）──

@@ -214,6 +214,15 @@ window.TimestampMode = {
     el.style.display = msg ? 'block' : 'none';
   },
 
+  // ── 切離模式時的 cleanup（由 core.js setAppMode 呼叫）──
+  onLeave: function() {
+    var T = TimestampMode;
+    if (T.el.timelineList) {
+      var items = T.el.timelineList.querySelectorAll('.timeline-item.active');
+      items.forEach(function(item) { item.classList.remove('active'); });
+    }
+  },
+
   // ── Imported Playlists (.json) ──
   renderImportedList: function() {
     var T = TimestampMode;
@@ -366,6 +375,7 @@ window.TimestampMode = {
       onPlaying:       T.updateTimelinePlayerInfo,
       onActivePoll:    T.updateActiveTimestamp,
       onAnchorMarkers: T.renderTimestampMarkers,
+      onLeave:         T.onLeave,
     };
   },
 };
