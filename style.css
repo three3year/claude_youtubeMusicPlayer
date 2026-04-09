@@ -813,3 +813,227 @@ body {
     text-align: center;
   }
 }
+
+/* ── Mode Switcher ── */
+.mode-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px auto 0;
+  padding: 4px;
+  max-width: 320px;
+  background: var(--bg-surface-frosted);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-circle);
+}
+
+.mode-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-circle);
+  padding: 8px 18px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.mode-btn:hover {
+  color: var(--text-primary);
+}
+
+.mode-btn.active {
+  background: linear-gradient(135deg, var(--accent-pink-light), var(--accent-blue-light));
+  color: white;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.25);
+}
+
+/* ── Playlist Mode Layout ── */
+.main-content-playlist {
+  max-width: 1300px;
+  margin: 24px auto;
+  padding: 0 16px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.playlist-add-card {
+  flex: 0 0 380px;
+  background: var(--bg-surface-frosted);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  padding: 16px 20px;
+}
+
+.playlist-add-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.playlist-add-card .input-card {
+  padding: 0;
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.playlist-add-card .error-msg {
+  margin-top: 8px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.playlist-card {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-surface-frosted);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  padding: 16px 20px;
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
+}
+
+.playlist-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.playlist-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.playlist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-left: 3px solid transparent;
+}
+
+.playlist-item:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.playlist-item.active {
+  background: rgba(236, 72, 153, 0.08);
+  border-left-color: var(--accent-pink);
+}
+
+.playlist-item .pl-thumb {
+  width: 48px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background: var(--border-default);
+}
+
+.playlist-item .pl-index {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.playlist-item .pl-title {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlist-item .pl-delete {
+  opacity: 0;
+  border: none;
+  background: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.playlist-item:hover .pl-delete {
+  opacity: 1;
+}
+
+.playlist-item .pl-delete:hover {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ── Player Bar: shuffle/repeat active state ── */
+.transport-btn.active {
+  color: var(--accent-pink);
+}
+
+/* ── Responsive: Playlist Mode ── */
+@media (max-width: 900px) {
+  .main-content-playlist {
+    flex-direction: column;
+    padding: 0 12px;
+  }
+
+  .playlist-add-card {
+    flex: none;
+    width: 100%;
+  }
+
+  .playlist-card {
+    flex: none;
+    width: 100%;
+    max-height: none;
+  }
+}
+
+@media (max-width: 500px) {
+  .mode-switcher {
+    margin: 12px auto 0;
+  }
+
+  .main-content-playlist {
+    padding: 0;
+    margin: 12px 0 0;
+    gap: 0;
+  }
+
+  .playlist-add-card {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .playlist-card {
+    border-radius: 0;
+    border: none;
+    max-height: none;
+    height: calc(100vh - 240px);
+    overflow-y: auto;
+  }
+}

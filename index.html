@@ -11,6 +11,12 @@
 </head>
 <body>
 
+  <!-- Mode Switcher -->
+  <div class="mode-switcher">
+    <button class="mode-btn active" data-mode="timestamp">時間戳模式</button>
+    <button class="mode-btn" data-mode="playlist">播放清單模式</button>
+  </div>
+
   <!-- Main Content -->
   <div class="main-content">
     <!-- Left: Import -->
@@ -69,6 +75,38 @@ Song A 1:30
     </div>
   </div>
 
+  <!-- Playlist Mode Content -->
+  <div class="main-content-playlist" id="main-content-playlist" style="display:none">
+    <div class="playlist-add-card">
+      <h3>加入歌曲</h3>
+      <div class="input-card">
+        <input type="text" id="playlist-url-input" placeholder="貼上 YouTube 連結..." autocomplete="off">
+        <button class="btn-gradient" id="playlist-add-btn">加入</button>
+      </div>
+      <div class="error-msg" id="playlist-error"></div>
+    </div>
+
+    <div class="playlist-card">
+      <div class="timeline-header">
+        <h3>播放清單 <span id="playlist-count" style="font-weight:400;color:var(--text-tertiary);font-size:12px;"></span></h3>
+        <div class="playlist-actions">
+          <label class="btn-icon import-file-label" title="Import">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Import
+            <input type="file" id="playlist-import-file" accept=".json">
+          </label>
+          <button class="btn-icon" id="playlist-export-btn" title="Export">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+          <button class="btn-icon" id="playlist-clear-btn" title="Clear">Clear</button>
+        </div>
+      </div>
+      <div id="playlist-empty" class="timeline-empty">尚無歌曲</div>
+      <ul id="playlist-list" class="playlist-list"></ul>
+    </div>
+  </div>
+
   <!-- Player Bar -->
   <div class="player-bar" id="player-bar">
     <div class="player-bar-inner">
@@ -86,6 +124,9 @@ Song A 1:30
       <!-- Center: controls + progress -->
       <div class="player-center">
         <div class="transport-row">
+          <button class="transport-btn mode-only-playlist" id="shuffle-btn" title="Shuffle" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+          </button>
           <button class="transport-btn" id="prev-btn" title="Previous">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 20L9 12l10-8v16zM5 4h2v16H5V4z"/></svg>
           </button>
@@ -95,6 +136,10 @@ Song A 1:30
           </button>
           <button class="transport-btn" id="next-btn" title="Next">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 4l10 8-10 8V4zM17 4h2v16h-2V4z"/></svg>
+          </button>
+          <button class="transport-btn mode-only-playlist" id="repeat-btn" title="Repeat: off" style="display:none">
+            <svg id="icon-repeat-all" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            <svg id="icon-repeat-one" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/><text x="9" y="16" font-size="9" font-weight="bold" fill="currentColor" stroke="none">1</text></svg>
           </button>
         </div>
         <div class="progress-row">
@@ -124,6 +169,8 @@ Song A 1:30
     <div id="yt-player"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="core.js"></script>
+  <script src="timestamp.js"></script>
+  <script src="playlist.js"></script>
 </body>
 </html>
