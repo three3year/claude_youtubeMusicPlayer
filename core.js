@@ -10,7 +10,7 @@ window.App = {
     isPlaying: false,
     currentTime: 0,
     duration: 0,
-    volume: 75,
+    volume: 100,                    // 預設 100%（timestamp 模式 + 沒記憶的 playlist 歌曲）
     isMuted: false,
     currentVideoId: null,
     apiReady: false,
@@ -213,8 +213,12 @@ window.App = {
     }
     try { localStorage.setItem('prism_volume', String(s.volume)); } catch(e) {}
     try { localStorage.setItem('prism_muted', String(s.isMuted)); } catch(e) {}
+    if (App.el.volSlider) App.el.volSlider.value = s.volume;
     App.updateVolSliderBg();
     App.updateVolIcon();
+    // 通知當前模式（讓 playlist 模式記錄 per-song volume）
+    var m = App.modes[s.appMode];
+    if (m && m.onVolumeChange) m.onVolumeChange(s.volume);
   },
 
   toggleMute: function() {
@@ -297,6 +301,14 @@ window.App = {
       if (App.el.playerBar) App.el.playerBar.classList.remove('visible');
       if (App.el.iconPlay) App.updatePlayPauseIcon();
       if (App.el.timeCurrent) App.updateTimeDisplay();
+
+      // 重置音量為預設 100%（timestamp 模式進入後就保持 100；
+      // playlist 模式之後若播到有記憶的歌會由 playIndex 覆蓋）
+      s.volume = 100;
+      if (s.player && s.player.setVolume) s.player.setVolume(100);
+      if (App.el.volSlider) App.el.volSlider.value = 100;
+      App.updateVolSliderBg();
+      App.updateVolIcon();
     }
 
     s.appMode = mode;
@@ -348,15 +360,14 @@ window.App = {
     el.playerTitle = document.getElementById('player-title');
     el.playerSubtitle = document.getElementById('player-subtitle');
 
-    // 2. 從 localStorage 載入 volume / muted / mode
+    // 2. 從 localStorage 載入 muted / mode（音量不持久化，每次預設 100%）
     try {
-      var sv = localStorage.getItem('prism_volume');
-      if (sv !== null) { s.volume = Number(sv); el.volSlider.value = s.volume; }
       var sm = localStorage.getItem('prism_muted');
       if (sm === 'true') s.isMuted = true;
       var smode = localStorage.getItem('prism_mode');
       if (smode === 'timestamp' || smode === 'playlist') s.appMode = smode;
     } catch(e) {}
+    el.volSlider.value = s.volume;
     App.updateVolSliderBg();
     App.updateVolIcon();
 

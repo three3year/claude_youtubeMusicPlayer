@@ -122,6 +122,10 @@ window.PlaylistMode = {
     if (idx < 0 || idx >= P.songs.length) return;
     P.currentIndex = idx;
     var song = P.songs[idx];
+    // 套用音量：有記憶用記憶值，沒有的歌一律 100%
+    // 在 loadVideo 之前以確保 onPlayerReady 拿到正確值
+    var targetVolume = (typeof song.volume === 'number') ? song.volume : 100;
+    App.setVolumeTo(targetVolume);
     App.el.playerTitle.textContent = song.title;
     App.el.playerSubtitle.textContent = '';
     App.loadVideo(song.id);
@@ -129,6 +133,14 @@ window.PlaylistMode = {
     if (P.shuffleEnabled) {
       var pos = P.shuffleOrder.indexOf(idx);
       if (pos >= 0) P.shufflePos = pos;
+    }
+  },
+
+  // ── 由 core.js setVolumeTo 呼叫：把當前音量記到當前歌曲 ──
+  onVolumeChange: function(val) {
+    var P = PlaylistMode;
+    if (P.currentIndex >= 0 && P.currentIndex < P.songs.length) {
+      P.songs[P.currentIndex].volume = val;
     }
   },
 
@@ -274,7 +286,9 @@ window.PlaylistMode = {
     var data = {
       type: 'playlist',
       songs: P.songs.map(function(s) {
-        return { id: s.id, url: s.url, title: s.title };
+        var out = { id: s.id, url: s.url, title: s.title };
+        if (typeof s.volume === 'number') out.volume = s.volume;
+        return out;
       }),
     };
     var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -300,7 +314,9 @@ window.PlaylistMode = {
           .map(function(s) {
             // 舊匯出檔可能還有 'Loading…' 字串，當成沒 title 處理
             var title = (s.title && s.title !== 'Loading…') ? s.title : s.id;
-            return { id: s.id, url: s.url || '', title: title };
+            var out = { id: s.id, url: s.url || '', title: title };
+            if (typeof s.volume === 'number') out.volume = s.volume;
+            return out;
           });
         P.currentIndex = -1;
         P.shufflePos = 0;
@@ -383,6 +399,7 @@ window.PlaylistMode = {
       onActivePoll:    function() {},      // 不需要
       onAnchorMarkers: function() {},      // 不畫 markers
       onLeave:         P.onLeave,
+      onVolumeChange:  P.onVolumeChange,   // 把音量記到當前歌曲
     };
   },
 };
