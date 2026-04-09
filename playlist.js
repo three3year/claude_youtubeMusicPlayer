@@ -20,6 +20,16 @@ window.PlaylistMode = {
     repeatIconAll: null, repeatIconOne: null,
   },
 
+  // ── Title fetching via YouTube oEmbed ──
+  fetchTitle: function(videoId) {
+    var watchUrl = 'https://www.youtube.com/watch?v=' + videoId;
+    var oembed = 'https://www.youtube.com/oembed?url=' + encodeURIComponent(watchUrl) + '&format=json';
+    return fetch(oembed)
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(data) { return (data && data.title) || null; })
+      .catch(function() { return null; });
+  },
+
   // ── 核心函式 ──
   addSingle: function(url) {
     var P = PlaylistMode;
@@ -30,10 +40,19 @@ window.PlaylistMode = {
       P.showError('歌曲已在清單中');
       return false;
     }
-    P.songs.push({ id: id, url: url, title: 'Loading…' });
+    // 暫時用 id 當 title（不是 Loading…），fetch 完成後會被覆蓋
+    var song = { id: id, url: url, title: id };
+    P.songs.push(song);
     if (P.shuffleEnabled) P.shuffleOrder.push(P.songs.length - 1);
     P.showError('');
     P.render();
+    // 非同步從 oEmbed 抓真實 title
+    P.fetchTitle(id).then(function(title) {
+      if (title) {
+        song.title = title;
+        P.render();
+      }
+    });
     return true;
   },
 
@@ -279,13 +298,26 @@ window.PlaylistMode = {
         P.songs = data.songs
           .filter(function(s) { return s && s.id; })
           .map(function(s) {
-            return { id: s.id, url: s.url || '', title: s.title || 'Loading…' };
+            // 舊匯出檔可能還有 'Loading…' 字串，當成沒 title 處理
+            var title = (s.title && s.title !== 'Loading…') ? s.title : s.id;
+            return { id: s.id, url: s.url || '', title: title };
           });
         P.currentIndex = -1;
         P.shufflePos = 0;
         if (P.shuffleEnabled) P.rebuildShuffleOrder();
         P.showError('');
         P.render();
+        // 非同步補抓所有「title 還是 id」的歌
+        P.songs.forEach(function(song) {
+          if (song.title === song.id) {
+            P.fetchTitle(song.id).then(function(title) {
+              if (title) {
+                song.title = title;
+                P.render();
+              }
+            });
+          }
+        });
       } catch(err) {
         P.showError('無法解析 JSON');
       }

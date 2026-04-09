@@ -141,6 +141,8 @@ window.App = {
       s.isPlaying = true;
       var d = event.target.getDuration && event.target.getDuration();
       if (d > 0) s.duration = d;
+      // 確保 player bar 顯示（切換模式 cleanup 後重新播放會走到這裡）
+      if (App.el.playerBar) App.el.playerBar.classList.add('visible');
       var m1 = App.modes[s.appMode];
       if (m1 && m1.onPlaying) m1.onPlaying();
     } else if (event.data === 2) { // PAUSED
